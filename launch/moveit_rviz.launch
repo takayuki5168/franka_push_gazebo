@@ -27,8 +27,8 @@
   </include>
 
   <!-- Run Rviz -->
-  <node name="$(anon rviz)" pkg="rviz" type="rviz" respawn="false"
-        args="-d $(find franka_push_gazebo)/config/moveit.rviz" output="screen">
-    <rosparam command="load" file="$(find panda_moveit_config)/config/kinematics.yaml"/>
-  </node>
+  <!-- <node name="$(anon rviz)" pkg="rviz" type="rviz" respawn="false" -->
+  <!--       args="-d $(find franka_push_gazebo)/config/moveit.rviz" output="screen"> -->
+  <!--   <rosparam command="load" file="$(find panda_moveit_config)/config/kinematics.yaml"/> -->
+  <!-- </node> -->
 </launch>
