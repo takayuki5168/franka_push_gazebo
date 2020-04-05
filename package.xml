@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>gazebo_push_env</name>
+  <name>franka_push_gazebo</name>
   <version>0.0.0</version>
-  <description>The gazebo_push_env package</description>
+  <description>The franka_push_gazebo package</description>
 
   <maintainer email="takayuki5168@gmail.com">Takayuki Murooka</maintainer>
 
