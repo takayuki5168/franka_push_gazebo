@@ -1,23 +1,23 @@
 Franka Emika Panda Pushing Object in Gazebo
 ===========================================
 
-## Launch
+![sample1](https://github.com/takayuki5168/franka_push_gazebo/blob/master/figs/panda.png)
+
+## How to Use
+- Launch panda in Gazebo with MoveIt
 ```sh
 $ roslaunch franka_push_gazebo bringup.launch
 ```
-
-## Tune PID Gain of Joint Angle Controllers
-```sh
-$ rosrun rqt_reconfigure rqt_reconfigure
-```
-- save parameters in `franka_gazebo/config/pid.yaml`
-
-## Test Moving
-```sh
-$ python scripts/ik_server.py
-```
-
-## Gazebo Interface by Python
+- Launch python interface of Gazebo
 ```sh
 $ python scripts/gazebo_interface.py
+In [1]: gi.init_robot_pose()
+In [2]: gi.set_cartesian_pose([0.5, 0, 0.12])
+```
+
+## Trouble Shooting
+### Jerky joints
+- Tune PID gains of joint angles controllers, then save in `franka_gazebo/config/pid.yaml`
+```sh
+$ rosrun rqt_reconfigure rqt_reconfigure
 ```
