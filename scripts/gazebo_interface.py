@@ -1,6 +1,7 @@
 from IPython import embed
 
 import rospy
+from std_msgs.msg import Float32MultiArray
 from gazebo_msgs.msg import ModelState
 from gazebo_msgs.srv import GetModelState, SetModelState
 from geometry_msgs.msg import Pose, Point, Quaternion
@@ -27,6 +28,9 @@ class GazeboInterface(object):
         self.initial_object_pose.position.x = 0.4
         self.initial_object_pose.position.y = 0
         self.initial_object_pose.position.z = 0
+
+        # object params
+        self.object_mu_pub = rospy.Publisher("object_params/mu", Float32MultiArray)
 
     # get object state
     def get_object_state(self):
@@ -94,6 +98,10 @@ class GazeboInterface(object):
         plan = self.group.plan()
         self.group.go()
 
+    # set object state
+    def set_object_mu(self, mu=[1, 1]):
+        msg = Float32MultiArray(data=mu)
+        self.object_mu_pub.publish(msg)
 
 if __name__ == '__main__':
     gi = GazeboInterface()

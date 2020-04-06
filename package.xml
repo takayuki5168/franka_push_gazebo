@@ -10,10 +10,15 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <build_depend>roscpp</build_depend>
+  <build_depend>gazebo_ros</build_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>gazebo_ros</exec_depend>
   <exec_depend>gazebo_ros</exec_depend>
 
   <export>
     <gazebo_ros gazebo_media_path="${prefix}/worlds" />
+    <gazebo_ros plugin_path="${prefix}/../../devel/lib" gazebo_media_path="${prefix}" />
   </export>
 
 </package>
