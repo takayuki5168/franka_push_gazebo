@@ -31,6 +31,7 @@ catkin_package(
   gazebo_ros
   )
 
+catkin_python_setup()
 
 link_directories(${GAZEBO_LIBRARY_DIRS})
 include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS})

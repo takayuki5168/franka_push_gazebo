@@ -14,7 +14,7 @@ class GazeboInterface(object):
         # name
         self.robot_name = "panda"
         self.robot_hand_name = "panda_hand"
-        self.object_name = "wood_cube_10cm"
+        self.object_name = "wood_cube_5cm"
         self.origin_name = self.robot_name
 
         # moveit commander
