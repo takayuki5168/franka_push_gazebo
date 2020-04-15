@@ -14,10 +14,11 @@ class GazeboInterface(object):
         # name
         self.robot_name = "panda"
         self.robot_hand_name = "panda_hand"
-        self.object_name = "wood_cube_5cm"
+        self.object_name = "object"
         self.origin_name = self.robot_name
 
         # moveit commander
+        self.robot = moveit_commander.RobotCommander()
         self.group = moveit_commander.MoveGroupCommander("panda_arm")
 
         # initial robot pose
@@ -25,12 +26,13 @@ class GazeboInterface(object):
 
         # initial object pose
         self.initial_object_pose = Pose()
-        self.initial_object_pose.position.x = 0.4
+        self.initial_object_pose.position.x = 0.6
         self.initial_object_pose.position.y = 0
         self.initial_object_pose.position.z = 0
 
         # object params
         self.object_mu_pub = rospy.Publisher("object_params/mu", Float32MultiArray)
+        self.object_friction_pub = rospy.Publisher("object_params/friction", Float32MultiArray)
 
     # get object state
     def get_object_state(self):
@@ -82,26 +84,34 @@ class GazeboInterface(object):
         print(eslf.get_cartesian_pose())
 
     # set robot state
-    def set_joint_angles(self, joint_angles):
+    def set_joint_angles(self, joint_angles, vel=2):
         self.group.set_joint_value_target(joint_angles)
         self.group.set_start_state_to_current_state()
         plan = self.group.plan()
-        self.group.go()
+        plan = self.group.retime_trajectory(self.robot.get_current_state(), plan, vel)
+        self.group.execute(plan)
 
     def init_robot_pose(self):
         self.set_joint_angles(self.initial_joint_angles)
 
-    def set_cartesian_pose(self, pos=[0, 0, 0], quat=[1, 0, 0, 0]):
+    def set_cartesian_pose(self, pos=[0, 0, 0], quat=[1, 0, 0, 0], vel=2):
         pose = Pose(position=Point(*pos), orientation=Quaternion(*quat))
 
         self.group.set_pose_target(pose, self.robot_hand_name)
         plan = self.group.plan()
-        self.group.go()
+        plan = self.group.retime_trajectory(self.robot.get_current_state(), plan, vel)
+        self.group.execute(plan)
 
     # set object state
     def set_object_mu(self, mu=[1, 1]):
         msg = Float32MultiArray(data=mu)
         self.object_mu_pub.publish(msg)
+
+    def set_object_friction(self, mu=[1, 1], coef=0):
+        fri = mu
+        fri.append(coef)
+        msg = Float32MultiArray(data=fri)
+        self.object_friction_pub.publish(msg)
 
 if __name__ == '__main__':
     gi = GazeboInterface()
