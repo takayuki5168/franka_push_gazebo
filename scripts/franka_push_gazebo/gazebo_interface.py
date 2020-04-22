@@ -1,4 +1,5 @@
 from IPython import embed
+import math
 
 import rospy
 from std_msgs.msg import Float32MultiArray
@@ -34,6 +35,9 @@ class GazeboInterface(object):
         self.object_mu_pub = rospy.Publisher("object_params/mu", Float32MultiArray)
         self.object_friction_pub = rospy.Publisher("object_params/friction", Float32MultiArray)
 
+    def sgn(self, a):
+        return 1 if a > 0 else -1
+
     # get object state
     def get_object_state(self):
         try:
@@ -44,6 +48,15 @@ class GazeboInterface(object):
 
     def get_object_pose(self):
         return self.get_object_state().pose
+
+    def get_object_pos(self):
+        pose = self.get_object_pose().position
+        return [pose.x, pose.y]
+
+    def get_object_ori(self):
+        orientation = self.get_object_pose().orientation
+        theta = self.sgn(orientation.z) * math.acos(orientation.w) * 2
+        return theta
 
     def print_object_pose(self):
         print(self.get_object_pose())
