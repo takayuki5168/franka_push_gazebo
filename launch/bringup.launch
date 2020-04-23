@@ -1,15 +1,8 @@
 <launch>
   <!-- gazebo -->
-  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+  <include file="$(find panda_simulation)/launch/simulation.launch">
+    <arg name="gui" value="true"/>
     <arg name="world_name" value="$(find franka_push_gazebo)/worlds/env.world"/>
+    <arg name="rviz" value="false"/>
   </include>
-
-  <!-- panda in gazebo after waiting for 5 seconds-->
-  <node pkg="timed_roslaunch" type="timed_roslaunch.sh"
-        args="5 $(find franka_gazebo)/launch/panda_arm_hand.launch"
-        name="timed_roslaunch_panda_arm_hand" output="screen" />
-  <!--<include file="$(find franka_gazebo)/launch/panda_arm_hand.launch"/>-->
-
-  <!-- moveit and rviz -->
-  <include file="$(find franka_push_gazebo)/launch/moveit_rviz.launch"/>
 </launch>
