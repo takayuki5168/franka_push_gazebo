@@ -27,14 +27,11 @@ class GazeboInterface(object):
         self.initial_joint_angles = [0.0, -0.785, 0.0, -2.356, 0.0, 1.571, 0.785]
 
         # initial object pose
-        self.initial_object_pose = Pose()
-        self.initial_object_pose.position.x = 0.6
-        self.initial_object_pose.position.y = 0
-        self.initial_object_pose.position.z = 0
+        self.initial_object_pose = [0.6, 0, 0]
 
         # object params
-        self.object_mu_pub = rospy.Publisher("object_params/mu", Float32MultiArray)
-        self.object_friction_pub = rospy.Publisher("object_params/friction", Float32MultiArray)
+        self.object_params_pub = rospy.Publisher("object_plugin/params", Float32MultiArray)
+        #self.object_friction_pub = rospy.Publisher("object_params/friction", Float32MultiArray)
 
     def sgn(self, a):
         return 1 if a > 0 else -1
@@ -76,13 +73,19 @@ class GazeboInterface(object):
         except rospy.ServiceException, e:
             print "Service call failed: %s" % e
 
-    def set_object_pose(self, pose):
-        state_msg = ModelState()
-        state_msg.pose = pose
-        self.set_object_state(state_msg)
+    # def set_object_pose(self, pose):
+    #     state_msg = ModelState()
+    #     state_msg.pose = pose
+    #     self.set_object_state(state_msg)
+
+    def set_object_pose(self, x, y, theta):
+         state_msg = ModelState()
+         state_msg.pose = Pose(position=Point(*[x, y, 0]),
+                               orientation=Quaternion(*[0, 0, math.sin(theta / 2.), math.cos(theta / 2.)]))
+         self.set_object_state(state_msg)
 
     def init_object_pose(self):
-        self.set_object_pose(self.initial_object_pose)
+        self.set_object_pose(*self.initial_object_pose)
 
     # get robot state
     def get_joint_angles(self):
@@ -117,15 +120,15 @@ class GazeboInterface(object):
         self.group.execute(plan)
 
     # set object state
-    def set_object_mu(self, mu=[1, 1]):
-        msg = Float32MultiArray(data=mu)
-        self.object_mu_pub.publish(msg)
+    def set_object_params(self, mass=1.0, cog=[0, 0], mu=[1, 1]):
+        msg = Float32MultiArray(data=[mass] + cog + mu)
+        self.object_params_pub.publish(msg)
 
-    def set_object_friction(self, mu=[1, 1], coef=0):
-        fri = mu
-        fri.append(coef)
-        msg = Float32MultiArray(data=fri)
-        self.object_friction_pub.publish(msg)
+    # def set_object_friction(self, mu=[1, 1], coef=0):
+    #     fri = mu
+    #     fri.append(coef)
+    #     msg = Float32MultiArray(data=fri)
+    #     self.object_friction_pub.publish(msg)
 
 if __name__ == '__main__':
     gi = GazeboInterface()
