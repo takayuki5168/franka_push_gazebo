@@ -29,7 +29,7 @@ public:
 
     // subscriber
     ros::SubscribeOptions so
-      = ros::SubscribeOptions::create<std_msgs::Float32MultiArray>("/object_params/mu",1,
+      = ros::SubscribeOptions::create<std_msgs::Float32MultiArray>("/object_plugin/params",1,
                                                          boost::bind(&ModelPush::OnRosMsg, this, _1),
                                                          ros::VoidPtr(), &this->rosQueue);
     this->rosSub = this->rosNode->subscribe(so);
@@ -41,10 +41,26 @@ public:
   void OnRosMsg(const std_msgs::Float32MultiArrayConstPtr &msg)
   {
     physics::LinkPtr link = model->GetLink("link");
+    physics::InertialPtr inertial = link->GetInertial();
+
+    // update mass
+    inertial->SetMass(msg->data.at(0));
+
+    // update cog
+    //math::Vector3 cog = inertial->GetCoG();
+    inertial->SetCoG(msg->data.at(1), msg->data.at(2), 0, 0, 0, 0);
+    //auto pos = model->WorldCoGPose();//.Pos();
+    //std::cout << pos.x << " " << pos.y << " " << pos.z << std::endl;
+
+    // update pos
+
+    // update friction
     physics::CollisionPtr col = link->GetCollision("collision");
     physics::SurfaceParamsPtr surface = col->GetSurface();
-    surface->FrictionPyramid()->SetMuPrimary(msg->data.at(0));
-    surface->FrictionPyramid()->SetMuSecondary(msg->data.at(1));
+    surface->FrictionPyramid()->SetMuPrimary(msg->data.at(3));
+    surface->FrictionPyramid()->SetMuSecondary(msg->data.at(4));
+
+    link->Update();
   }
 
   /// \brief ROS helper function that processes messages
