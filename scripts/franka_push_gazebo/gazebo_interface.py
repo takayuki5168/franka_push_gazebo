@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 from IPython import embed
 import math
+import sys
+import signal
 
 import rospy
 from std_msgs.msg import Float32MultiArray
@@ -19,9 +21,20 @@ class GazeboInterface(object):
         self.object_name = "object"
         self.origin_name = self.robot_name
 
-        # moveit commander
+        # robot commander
+        rd = False
+        while not rd:
+            rd = rospy.get_param('robot_description', False)
         self.robot = moveit_commander.RobotCommander()
-        self.group = moveit_commander.MoveGroupCommander("panda_arm")
+
+        # move group commander
+        is_move_group = False
+        while not is_move_group:
+            try:
+                self.group = moveit_commander.MoveGroupCommander("panda_arm")
+                is_move_group = True
+            except:
+                continue
 
         # initial robot pose
         self.initial_joint_angles = [0.0, -0.785, 0.0, -2.356, 0.0, 1.571, 0.785]
@@ -131,5 +144,6 @@ class GazeboInterface(object):
     #     self.object_friction_pub.publish(msg)
 
 if __name__ == '__main__':
+    signal.signal(signal.SIGINT, lambda x, y: sys.exit(0))
     gi = GazeboInterface()
     embed()
