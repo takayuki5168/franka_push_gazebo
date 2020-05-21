@@ -119,6 +119,7 @@ class GazeboInterface(object):
         self.group.set_start_state_to_current_state()
         plan = self.group.plan()
         plan = self.group.retime_trajectory(self.robot.get_current_state(), plan, vel)
+
         self.group.execute(plan)
 
     def init_robot_pose(self):
@@ -130,7 +131,14 @@ class GazeboInterface(object):
         self.group.set_pose_target(pose, self.robot_hand_name)
         plan = self.group.plan()
         plan = self.group.retime_trajectory(self.robot.get_current_state(), plan, vel)
+
+        elapsed_time = plan.joint_trajectory.points[-1].time_from_start - plan.joint_trajectory.points[0].time_from_start
+        elapsed_time_sec = elapsed_time.secs + elapsed_time.nsecs * 1e-9
+        print("elapsed_time:{}".format(elapsed_time_sec))
+
         self.group.execute(plan)
+
+        return elapsed_time_sec
 
     # set object state
     def set_object_params(self, mass=1.0, cog=[0, 0], mu=[1, 1]):
