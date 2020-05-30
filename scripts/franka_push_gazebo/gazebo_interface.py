@@ -53,11 +53,6 @@ class GazeboInterface(object):
 
     # get object state
     def get_object_state(self):
-        # try:
-        #     get_object_state = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
-        #     return get_object_state(self.object_name, self.origin_name)
-        # except rospy.ServiceException, e:
-        #     print "Service call failed: %s" % e
         get_object_state = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
         return get_object_state(self.object_name, self.origin_name)
 
@@ -89,11 +84,6 @@ class GazeboInterface(object):
             res = set_object_state(state_msg)
         except rospy.ServiceException, e:
             print "Service call failed: %s" % e
-
-    # def set_object_pose(self, pose):
-    #     state_msg = ModelState()
-    #     state_msg.pose = pose
-    #     self.set_object_state(state_msg)
 
     def set_object_pose(self, x, y, theta):
          state_msg = ModelState()
@@ -148,12 +138,6 @@ class GazeboInterface(object):
     def set_object_params(self, mass=1.0, cog=[0, 0], mu=[1, 1]):
         msg = Float32MultiArray(data=[mass] + cog + mu)
         self.object_params_pub.publish(msg)
-
-    # def set_object_friction(self, mu=[1, 1], coef=0):
-    #     fri = mu
-    #     fri.append(coef)
-    #     msg = Float32MultiArray(data=fri)
-    #     self.object_friction_pub.publish(msg)
 
 if __name__ == '__main__':
     rospy.init_node('gazebo_interface')
