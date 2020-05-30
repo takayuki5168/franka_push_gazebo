@@ -13,7 +13,7 @@ import moveit_commander
 
 class GazeboInterface(object):
     def __init__(self):
-        rospy.init_node('gazebo_interface')
+        #rospy.init_node('gazebo_interface')
 
         # name
         self.robot_name = "panda"
@@ -36,6 +36,9 @@ class GazeboInterface(object):
             except:
                 continue
 
+        # wait /gazebo/get_model_state
+        rospy.wait_for_service('/gazebo/get_model_state')
+
         # initial robot pose
         self.initial_joint_angles = [0.0, -0.785, 0.0, -2.356, 0.0, 1.571, 0.785]
 
@@ -43,19 +46,20 @@ class GazeboInterface(object):
         self.initial_object_pose = [0.6, 0, 0]
 
         # object params
-        self.object_params_pub = rospy.Publisher("object_plugin/params", Float32MultiArray)
-        #self.object_friction_pub = rospy.Publisher("object_params/friction", Float32MultiArray)
+        self.object_params_pub = rospy.Publisher("object_plugin/params", Float32MultiArray, queue_size=1)
 
     def sgn(self, a):
         return 1 if a > 0 else -1
 
     # get object state
     def get_object_state(self):
-        try:
-            get_object_state = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
-            return get_object_state(self.object_name, self.origin_name)
-        except rospy.ServiceException, e:
-            print "Service call failed: %s" % e
+        # try:
+        #     get_object_state = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
+        #     return get_object_state(self.object_name, self.origin_name)
+        # except rospy.ServiceException, e:
+        #     print "Service call failed: %s" % e
+        get_object_state = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
+        return get_object_state(self.object_name, self.origin_name)
 
     def get_object_pose(self):
         return self.get_object_state().pose
@@ -114,7 +118,7 @@ class GazeboInterface(object):
         print(eslf.get_cartesian_pose())
 
     # set robot state
-    def set_joint_angles(self, joint_angles, vel=2):
+    def set_joint_angles(self, joint_angles, vel=1):
         self.group.set_joint_value_target(joint_angles)
         self.group.set_start_state_to_current_state()
         plan = self.group.plan()
@@ -125,7 +129,7 @@ class GazeboInterface(object):
     def init_robot_pose(self):
         self.set_joint_angles(self.initial_joint_angles)
 
-    def set_cartesian_pose(self, pos=[0, 0, 0], quat=[1, 0, 0, 0], vel=2):
+    def set_cartesian_pose(self, pos=[0, 0, 0], quat=[1, 0, 0, 0], vel=1, wait=True):
         pose = Pose(position=Point(*pos), orientation=Quaternion(*quat))
 
         self.group.set_pose_target(pose, self.robot_hand_name)
@@ -136,7 +140,7 @@ class GazeboInterface(object):
         elapsed_time_sec = elapsed_time.secs + elapsed_time.nsecs * 1e-9
         print("elapsed_time:{}".format(elapsed_time_sec))
 
-        self.group.execute(plan)
+        self.group.execute(plan, wait)
 
         return elapsed_time_sec
 
@@ -152,6 +156,8 @@ class GazeboInterface(object):
     #     self.object_friction_pub.publish(msg)
 
 if __name__ == '__main__':
+    rospy.init_node('gazebo_interface')
+
     signal.signal(signal.SIGINT, lambda x, y: sys.exit(0))
     gi = GazeboInterface()
     embed()
