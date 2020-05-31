@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<robot name="plane">
+  <link name="world"/>
+
+  <!-- for plane z -->
+  <joint name="plane_z_joint" type="continuous">
+    <parent link="world"/>
+    <child link="plane_z_link"/>
+    <axis xyz="0 0 1"/>
+    <origin xyz="0.5 0 0.1" rpy="0 0 0"/>
+  </joint>
+  <transmission name="plane_z_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="plane_z_joint">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="plane_z_motor">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      <mechanismReduction>1</mechanismReduction>
+    </actuator>
+  </transmission>
+  <link name="plane_z_link">
+    <inertial>
+      <mass value="1.0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <visual>
+    </visual>
+    <collision>
+    </collision>
+  </link>
+
+  <!-- for plane x -->
+  <joint name="plane_x_joint" type="continuous">
+    <parent link="plane_z_link"/>
+    <child link="plane_x_link"/>
+    <axis xyz="1 0 0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+  <transmission name="plane_x_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="plane_x_joint">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="plane_x_motor">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      <mechanismReduction>1</mechanismReduction>
+    </actuator>
+  </transmission>
+  <link name="plane_x_link">
+    <inertial>
+      <mass value="1.0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <visual>
+    </visual>
+    <collision>
+    </collision>
+  </link>
+
+  <!-- for plane board -->
+  <joint name="plane_board_joint" type="continuous">
+    <parent link="plane_x_link"/>
+    <child link="plane_board_link"/>
+    <axis xyz="0 0 1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+  <transmission name="plane_board_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="plane_board_joint">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="plane_board_motor">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      <mechanismReduction>1</mechanismReduction>
+    </actuator>
+  </transmission>
+  <link name="plane_board_link">
+    <inertial>
+      <mass value="1.0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    <visual>
+      <geometry>
+      <box size="0.8 0.8 0.01"/>
+  </geometry>
+    <!-- <material> -->
+    <!--   <ambient>0.5 0.5 0.5 1</ambient> -->
+    <!--   <diffuse>0.5 0.5 0.5 1</diffuse> -->
+    <!--   <specular>0.1 0.1 0.1 1</specular> -->
+    <!--   <emissive>0 0 0 0</emissive> -->
+    <!-- </material> -->
+    </visual>
+    <collision>
+      <geometry>
+      <box size="0.8 0.8 0.01"/>
+  </geometry>
+    </collision>
+  </link>
+
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/plane</robotNamespace>
+      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+      <legacyModeNS>true</legacyModeNS>
+    </plugin>
+  </gazebo>
+</robot>
