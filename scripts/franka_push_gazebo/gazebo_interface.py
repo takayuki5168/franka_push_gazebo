@@ -46,7 +46,7 @@ class GazeboInterface(object):
         self.initial_joint_angles = [0.0, -0.785, 0.0, -2.356, 0.0, 1.571, 0.785]
 
         # initial object pose
-        self.initial_object_pose = [0.5, 0, 0]
+        #self.initial_object_pose = [0.5, 0, 0]
 
         # for plane state
         self.plane_state_sub = rospy.Subscriber("/gazebo/link_states", LinkStates, self.plane_state_cb)
@@ -99,14 +99,14 @@ class GazeboInterface(object):
         except rospy.ServiceException, e:
             print "Service call failed: %s" % e
 
-    def set_object_pose(self, x, y, theta):
+    def set_object_pose(self, x, y, z, theta):
          state_msg = ModelState()
-         state_msg.pose = Pose(position=Point(*[x, y, 0]),
+         state_msg.pose = Pose(position=Point(*[x, y, z]),
                                orientation=Quaternion(*[0, 0, math.sin(theta / 2.), math.cos(theta / 2.)]))
          self.set_object_state(state_msg)
 
-    def init_object_pose(self):
-        self.set_object_pose(*self.initial_object_pose)
+    # def init_object_pose(self):
+    #     self.set_object_pose(*self.initial_object_pose)
 
     # set object state
     def set_object_params(self, mass=1.0, cog=[0, 0], mu=[1, 1]):
