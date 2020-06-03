@@ -3,11 +3,12 @@ from IPython import embed
 import math
 import sys
 import signal
+import time
 
 import rospy
 from std_msgs.msg import Float32MultiArray, Float64
 from gazebo_msgs.msg import ModelState, LinkStates
-from gazebo_msgs.srv import GetModelState, SetModelState
+from gazebo_msgs.srv import GetModelState, SetModelState, GetLinkProperties#, SetLinkProperties
 from geometry_msgs.msg import Pose, Point, Quaternion
 import moveit_commander
 
@@ -73,6 +74,10 @@ class GazeboInterface(object):
     def get_object_pose(self):
         return self.get_object_state().pose
 
+    def get_object_z(self):
+        pose = self.get_object_pose().position
+        return pose.z
+
     def get_object_pos(self):
         pose = self.get_object_pose().position
         return [pose.x, pose.y]
@@ -84,6 +89,18 @@ class GazeboInterface(object):
 
     def print_object_pose(self):
         print(self.get_object_pose())
+
+    def get_object_prop(self):
+        get_object_prop = rospy.ServiceProxy('/gazebo/get_link_properties', GetLinkProperties)
+        return get_object_prop(self.object_name + "::link")
+
+    def get_object_cog(self):
+        cog = self.get_object_prop().com.position
+        return [cog.x, cog.y, cog.z]
+
+    def get_object_mass(self):
+        mass = self.get_object_prop().mass
+        return mass
 
     # set object state
     def set_object_state(self, state):
@@ -108,10 +125,15 @@ class GazeboInterface(object):
     # def init_object_pose(self):
     #     self.set_object_pose(*self.initial_object_pose)
 
-    # set object state
-    def set_object_params(self, mass=1.0, cog=[0, 0], mu=[1, 1]):
-        msg = Float32MultiArray(data=[mass] + cog + mu)
+    def set_object_params(self, mu=[1, 1]):
+        msg = Float32MultiArray(data=mu)
         self.object_params_pub.publish(msg)
+
+    # def set_object_prop(self, mass, cog):
+    #     set_object_prop = rospy.ServiceProxy('/gazebo/set_link_properties', SetLinkProperties)
+    #     return set_object_prop(link_name=self.object_name+"::link", mass=mass, com=Pose(position=Point(x=cog[0], y=cog[1], z=0)),
+    #                            ixx=0.0014, iyy=0.0014, izz=0.0014,
+    #                            gravity_mode=True)
 
     # get robot state
     def get_joint_angles(self):
@@ -184,19 +206,20 @@ class GazeboInterface(object):
             angle_z += math.pi
             sgn *= -1
         msg_z = Float64(data=angle_z)
-        self.plane_z_controller_pub.publish(msg_z)
 
         angle_x = sgn * -angle
         msg_x = Float64(data=angle_x)
-        self.plane_x_controller_pub.publish(msg_x)
 
         angle_z2 = 2 * math.asin(math.cos(angle_x) * math.sin(angle_z / 2.))
         angle_z2 = abs(angle_z2) * -1 * self.sgn(angle_z)
-        print(angle_z2)
+        #print(angle_z2)
         msg_z2 = Float64(data=angle_z2)
+
+        self.plane_z_controller_pub.publish(msg_z)
+        self.plane_x_controller_pub.publish(msg_x)
         self.plane_board_controller_pub.publish(msg_z2)
 
-        #print(angle_z, angle_x, angle_z2)
+        print(angle_z, angle_x, angle_z2)
 
 
 if __name__ == '__main__':

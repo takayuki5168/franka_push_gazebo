@@ -43,24 +43,35 @@ public:
     physics::LinkPtr link = model->GetLink("link");
     physics::InertialPtr inertial = link->GetInertial();
 
+    /*
     // update mass
     inertial->SetMass(msg->data.at(0));
 
     // update cog
-    //math::Vector3 cog = inertial->GetCoG();
-    inertial->SetCoG(msg->data.at(1), msg->data.at(2), 0, 0, 0, 0);
+    //inertial->SetCoG(msg->data.at(1), msg->data.at(2), 0, 0, 0, 0);
+    inertial->SetCoG(msg->data.at(1), msg->data.at(2), 0);
     //auto pos = model->WorldCoGPose();//.Pos();
     //std::cout << pos.x << " " << pos.y << " " << pos.z << std::endl;
+    */
 
     // update pos
 
     // update friction
-    physics::CollisionPtr col = link->GetCollision("collision");
-    physics::SurfaceParamsPtr surface = col->GetSurface();
-    surface->FrictionPyramid()->SetMuPrimary(msg->data.at(3));
-    surface->FrictionPyramid()->SetMuSecondary(msg->data.at(4));
+    try{
+      physics::CollisionPtr col = link->GetCollision("collision");
+      std::cout << "PO" << std::endl;
+      physics::SurfaceParamsPtr surface = col->GetSurface();
+      std::cout << "PO" << std::endl;
+      surface->FrictionPyramid()->SetMuPrimary(msg->data.at(0));
+      std::cout << "PO" << std::endl;
+      surface->FrictionPyramid()->SetMuSecondary(msg->data.at(1));
+      std::cout << "PO" << std::endl;
+    }
+    catch (char *str) {
+      std::cout << str << std::endl;;
+    }
 
-    link->Update();
+      link->Update();
   }
 
   /// \brief ROS helper function that processes messages
