@@ -36,12 +36,4 @@
     type="spawner" respawn="false"
     output="screen" ns="/plane"
     args="plane_z_joint_position_controller plane_x_joint_position_controller plane_board_joint_position_controller"/>
-
-  <!-- object -->
-  <!-- <group ns="object"> -->
-  <!--   <arg name="model_object" default="$(find franka_push_gazebo)/worlds/object.urdf"/> -->
-  <!--   <param name="robot_description" command="$(find xacro)/xacro $(arg model_object)"/> -->
-  <!--   <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model object -->
-  <!--             -x 0.5 -y 0 -z 0.5" /> -->
-  <!-- </group> -->
 </launch>

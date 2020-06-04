@@ -16,7 +16,6 @@ public:
   void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   {
     this->model = _parent;
-    //this->updateConnection = event::Events::ConnectWorldUpdateBegin(std::bind(&ModelPush::OnUpdate, this));
 
     // ros node
     if (!ros::isInitialized()) {
@@ -42,19 +41,6 @@ public:
   {
     physics::LinkPtr link = model->GetLink("link");
     physics::InertialPtr inertial = link->GetInertial();
-
-    /*
-    // update mass
-    inertial->SetMass(msg->data.at(0));
-
-    // update cog
-    //inertial->SetCoG(msg->data.at(1), msg->data.at(2), 0, 0, 0, 0);
-    inertial->SetCoG(msg->data.at(1), msg->data.at(2), 0);
-    //auto pos = model->WorldCoGPose();//.Pos();
-    //std::cout << pos.x << " " << pos.y << " " << pos.z << std::endl;
-    */
-
-    // update pos
 
     // update friction
     try{
@@ -83,18 +69,6 @@ public:
         this->rosQueue.callAvailable(ros::WallDuration(timeout));
       }
   }
-
-  /*
-  // Called by the world update start event
-  void OnUpdate()
-  {
-  physics::LinkPtr link = model->GetLink("link");
-  physics::CollisionPtr col = link->GetCollision("collision");
-  physics::SurfaceParamsPtr surface = col->GetSurface();
-  surface->FrictionPyramid()->SetMuPrimary(0.001);
-  surface->FrictionPyramid()->SetMuSecondary(0.001);
-  }
-  */
 
 private:
   physics::ModelPtr model;
