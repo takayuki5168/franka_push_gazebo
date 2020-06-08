@@ -42,22 +42,19 @@ public:
     physics::LinkPtr link = model->GetLink("link");
     physics::InertialPtr inertial = link->GetInertial();
 
-    // update friction
-    try{
-      physics::CollisionPtr col = link->GetCollision("collision");
-      std::cout << "PO" << std::endl;
-      physics::SurfaceParamsPtr surface = col->GetSurface();
-      std::cout << "PO" << std::endl;
-      surface->FrictionPyramid()->SetMuPrimary(msg->data.at(0));
-      std::cout << "PO" << std::endl;
-      surface->FrictionPyramid()->SetMuSecondary(msg->data.at(1));
-      std::cout << "PO" << std::endl;
-    }
-    catch (char *str) {
-      std::cout << str << std::endl;;
-    }
+    // update mass
+    inertial->SetMass(msg->data.at(0));
 
-      link->Update();
+    // update inertia
+    inertial->SetIZZ(msg->data.at(1));
+
+    // update mu
+    physics::CollisionPtr col = link->GetCollision("collision");
+    physics::SurfaceParamsPtr surface = col->GetSurface();
+    surface->FrictionPyramid()->SetMuPrimary(msg->data.at(2));
+    surface->FrictionPyramid()->SetMuSecondary(msg->data.at(3));
+
+    link->Update();
   }
 
   /// \brief ROS helper function that processes messages

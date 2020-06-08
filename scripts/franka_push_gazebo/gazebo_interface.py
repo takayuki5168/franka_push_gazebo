@@ -8,7 +8,7 @@ import time
 import rospy
 from std_msgs.msg import Float32MultiArray, Float64
 from gazebo_msgs.msg import ModelState, LinkStates
-from gazebo_msgs.srv import GetModelState, SetModelState, GetLinkProperties#, SetLinkProperties
+from gazebo_msgs.srv import GetModelState, SetModelState, GetLinkProperties, SetLinkProperties
 from geometry_msgs.msg import Pose, Point, Quaternion
 import moveit_commander
 
@@ -23,6 +23,11 @@ class GazeboInterface(object):
         self.plane_name = "plane"
         #self.origin_name = self.robot_name
         self.origin_name = "world"
+
+        self.mass = 0.1
+        self.izz = 0.001
+        self.mu = [0.1, 0.1]
+
 
         # robot commander
         if not no_panda:
@@ -100,7 +105,15 @@ class GazeboInterface(object):
 
     def get_object_mass(self):
         mass = self.get_object_prop().mass
-        return mass
+        izz = self.get_object_prop().izz
+        return mass, izz
+
+    def print_object_prop(self):
+        mass, izz = self.get_object_mass()
+        print('  mass:{}'.format(mass))
+        print('  izz:{}'.format(izz))
+        print('  mu:{}, mu2:{}'.format(self.mu[0], self.mu[1]))
+
 
     # set object state
     def set_object_state(self, state):
@@ -125,9 +138,20 @@ class GazeboInterface(object):
     # def init_object_pose(self):
     #     self.set_object_pose(*self.initial_object_pose)
 
-    def set_object_params(self, mu=[1, 1]):
-        msg = Float32MultiArray(data=mu)
+    def set_object_params(self, mass=0.1, izz=0.001, mu=[0.1, 0.1]):
+        self.mass = mass
+        self.izz = izz
+        self.mu = mu
+
+        msg = Float32MultiArray(data=[mass, izz] + mu)
         self.object_params_pub.publish(msg)
+
+    # def set_object_mass(self, mass, izz=None):
+    #     set_object_prop = rospy.ServiceProxy('/gazebo/set_link_properties', SetLinkProperties)
+    #     if izz:
+    #         return set_object_prop(link_name=self.object_name+"::link", mass=mass)
+    #     else:
+    #         return set_object_prop(link_name=self.object_name+"::link", mass=mass, izz=izz)
 
     # def set_object_prop(self, mass, cog):
     #     set_object_prop = rospy.ServiceProxy('/gazebo/set_link_properties', SetLinkProperties)
