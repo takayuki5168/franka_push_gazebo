@@ -191,15 +191,21 @@ class GazeboInterface(object):
         plan = self.group.plan()
         plan = self.group.retime_trajectory(self.robot.get_current_state(), plan, vel)
 
-        try:
-            elapsed_time = plan.joint_trajectory.points[-1].time_from_start - plan.joint_trajectory.points[0].time_from_start
-            elapsed_time_sec = elapsed_time.secs + elapsed_time.nsecs * 1e-9
-            print("elapsed_time:{}".format(elapsed_time_sec))
+        elapsed_time = plan.joint_trajectory.points[-1].time_from_start - plan.joint_trajectory.points[0].time_from_start
+        elapsed_time_sec = elapsed_time.secs + elapsed_time.nsecs * 1e-9
+        print("elapsed_time:{}".format(elapsed_time_sec))
 
-            self.group.execute(plan, wait)
-        except:
-            elapsed_time_sec = 1000
-            print("elapsed_time:{}".format(elapsed_time_sec))
+        self.group.execute(plan, wait)
+
+        # try:
+        #     elapsed_time = plan.joint_trajectory.points[-1].time_from_start - plan.joint_trajectory.points[0].time_from_start
+        #     elapsed_time_sec = elapsed_time.secs + elapsed_time.nsecs * 1e-9
+        #     print("elapsed_time:{}".format(elapsed_time_sec))
+
+        #     self.group.execute(plan, wait)
+        # except:
+        #     elapsed_time_sec = 1000
+        #     print("elapsed_time:{}".format(elapsed_time_sec))
 
         return elapsed_time_sec
 
