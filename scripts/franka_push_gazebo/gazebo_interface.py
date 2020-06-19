@@ -5,6 +5,7 @@ import sys
 import signal
 import time
 from subprocess import call
+import os, glob
 
 import rospy
 from std_msgs.msg import Float32MultiArray, Float64
@@ -65,6 +66,10 @@ class GazeboInterface(object):
 
         # object params
         self.object_params_pub = rospy.Publisher("object_plugin/params", Float32MultiArray, queue_size=1)
+
+        # delete gazebo defaulg log
+        f_name = glob.glob(os.environ['HOME'] + "/.gazebo/server*")[0] + "/default.log"
+        call(["rm", f_name])
 
     def plane_state_cb(self, msg):
         self.plane_pose = msg.pose[msg.name.index("plane::plane_board_link")]
@@ -188,35 +193,25 @@ class GazeboInterface(object):
     def set_cartesian_pose(self, pos=[0, 0, 0], quat=[1, 0, 0, 0], vel=1, wait=True):
         pose = Pose(position=Point(*pos), orientation=Quaternion(*quat))
 
-        for i in range(5):
-            self.group.set_pose_target(pose, self.robot_hand_name)
-            plan = self.group.plan()
-            plan = self.group.retime_trajectory(self.robot.get_current_state(), plan, vel)
+        #for i in range(5):
+        self.group.set_pose_target(pose, self.robot_hand_name)
+        plan = self.group.plan()
+        plan = self.group.retime_trajectory(self.robot.get_current_state(), plan, vel)
 
-            try:
-                elapsed_time = plan.joint_trajectory.points[-1].time_from_start - plan.joint_trajectory.points[0].time_from_start
-                break
-            except:
-                if i == 4:
-                    call(["pkill", "rosmaster", "-9"])
-                    call(["pkill", "gzserver", "-9"])
-                    sys.exit(1)
-                pass
+        try:
+            elapsed_time = plan.joint_trajectory.points[-1].time_from_start - plan.joint_trajectory.points[0].time_from_start
+        except:
+            #if i == 4:
+            return -1
+            #call(["pkill", "rosmaster", "-9"])
+            #call(["pkill", "gzserver", "-9"])
+            #sys.exit(1)
 
         elapsed_time_sec = elapsed_time.secs + elapsed_time.nsecs * 1e-9
         print("elapsed_time:{}".format(elapsed_time_sec))
 
-        self.group.execute(plan, wait)
-
-        # try:
-        #     elapsed_time = plan.joint_trajectory.points[-1].time_from_start - plan.joint_trajectory.points[0].time_from_start
-        #     elapsed_time_sec = elapsed_time.secs + elapsed_time.nsecs * 1e-9
-        #     print("elapsed_time:{}".format(elapsed_time_sec))
-
-        #     self.group.execute(plan, wait)
-        # except:
-        #     elapsed_time_sec = 1000
-        #     print("elapsed_time:{}".format(elapsed_time_sec))
+        if elapsed_time_sec < 5:
+            self.group.execute(plan, wait)
 
         return elapsed_time_sec
 
