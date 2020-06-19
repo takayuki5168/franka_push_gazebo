@@ -16,8 +16,6 @@ import moveit_commander
 
 class GazeboInterface(object):
     def __init__(self, no_panda=False):
-        #rospy.init_node('gazebo_interface')
-
         # name
         self.robot_name = "panda"
         self.robot_hand_name = "panda_hand"
@@ -52,9 +50,6 @@ class GazeboInterface(object):
 
         # initial robot pose
         self.initial_joint_angles = [0.0, -0.785, 0.0, -2.356, 0.0, 1.571, 0.785]
-
-        # initial object pose
-        #self.initial_object_pose = [0.5, 0, 0]
 
         # for plane state
         self.plane_state_sub = rospy.Subscriber("/gazebo/link_states", LinkStates, self.plane_state_cb)
@@ -141,9 +136,6 @@ class GazeboInterface(object):
                                orientation=Quaternion(*[0, 0, math.sin(theta / 2.), math.cos(theta / 2.)]))
          self.set_object_state(state_msg)
 
-    # def init_object_pose(self):
-    #     self.set_object_pose(*self.initial_object_pose)
-
     def set_object_params(self, mass=0.1, izz=0.001, mu=[0.1, 0.1]):
         self.mass = mass
         self.izz = izz
@@ -151,19 +143,6 @@ class GazeboInterface(object):
 
         msg = Float32MultiArray(data=[mass, izz] + mu)
         self.object_params_pub.publish(msg)
-
-    # def set_object_mass(self, mass, izz=None):
-    #     set_object_prop = rospy.ServiceProxy('/gazebo/set_link_properties', SetLinkProperties)
-    #     if izz:
-    #         return set_object_prop(link_name=self.object_name+"::link", mass=mass)
-    #     else:
-    #         return set_object_prop(link_name=self.object_name+"::link", mass=mass, izz=izz)
-
-    # def set_object_prop(self, mass, cog):
-    #     set_object_prop = rospy.ServiceProxy('/gazebo/set_link_properties', SetLinkProperties)
-    #     return set_object_prop(link_name=self.object_name+"::link", mass=mass, com=Pose(position=Point(x=cog[0], y=cog[1], z=0)),
-    #                            ixx=0.0014, iyy=0.0014, izz=0.0014,
-    #                            gravity_mode=True)
 
     # get robot state
     def get_joint_angles(self):
@@ -203,9 +182,6 @@ class GazeboInterface(object):
         except:
             #if i == 4:
             return -1
-            #call(["pkill", "rosmaster", "-9"])
-            #call(["pkill", "gzserver", "-9"])
-            #sys.exit(1)
 
         elapsed_time_sec = elapsed_time.secs + elapsed_time.nsecs * 1e-9
         print("elapsed_time:{}".format(elapsed_time_sec))
