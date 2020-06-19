@@ -28,7 +28,6 @@ class GazeboInterface(object):
         self.izz = 0.001
         self.mu = [0.1, 0.1]
 
-
         # robot commander
         if not no_panda:
             rd = False
@@ -48,6 +47,10 @@ class GazeboInterface(object):
         # wait /gazebo/get_model_state
         rospy.wait_for_service('/gazebo/get_model_state')
 
+        # delete gazebo defaulg log
+        f_name = glob.glob(os.environ['HOME'] + "/.gazebo/server*")[0] + "/default.log"
+        call(["rm", f_name])
+
         # initial robot pose
         self.initial_joint_angles = [0.0, -0.785, 0.0, -2.356, 0.0, 1.571, 0.785]
 
@@ -61,10 +64,6 @@ class GazeboInterface(object):
 
         # object params
         self.object_params_pub = rospy.Publisher("object_plugin/params", Float32MultiArray, queue_size=1)
-
-        # delete gazebo defaulg log
-        f_name = glob.glob(os.environ['HOME'] + "/.gazebo/server*")[0] + "/default.log"
-        call(["rm", f_name])
 
     def plane_state_cb(self, msg):
         self.plane_pose = msg.pose[msg.name.index("plane::plane_board_link")]
