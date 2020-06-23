@@ -20,8 +20,7 @@ class GazeboInterface(object):
         self.robot_name = "panda"
         self.robot_hand_name = "panda_hand"
         self.object_name = "object"
-        self.plane_name = "plane"
-        #self.origin_name = self.robot_name
+        #self.plane_name = "plane"
         self.origin_name = "world"
 
         self.mass = 0.1
@@ -55,18 +54,21 @@ class GazeboInterface(object):
         self.initial_joint_angles = [0.0, -0.785, 0.0, -2.356, 0.0, 1.571, 0.785]
 
         # for plane state
+        """
         self.plane_state_sub = rospy.Subscriber("/gazebo/link_states", LinkStates, self.plane_state_cb)
         self.plane_z_controller_pub = rospy.Publisher("/plane/plane_z_joint_position_controller/command", Float64, queue_size=1)
         self.plane_x_controller_pub = rospy.Publisher("/plane/plane_x_joint_position_controller/command", Float64, queue_size=1)
         self.plane_board_controller_pub = rospy.Publisher("/plane/plane_board_joint_position_controller/command", Float64, queue_size=1)
-
         self.plane_pose = Pose()
+        """
 
         # object params
         self.object_params_pub = rospy.Publisher("object_plugin/params", Float32MultiArray, queue_size=1)
 
+    """
     def plane_state_cb(self, msg):
         self.plane_pose = msg.pose[msg.name.index("plane::plane_board_link")]
+    """
 
     def sgn(self, a):
         return 1 if a > 0 else -1
@@ -190,6 +192,7 @@ class GazeboInterface(object):
 
         return elapsed_time_sec
 
+    """
     # get plane state
     def get_plane_pose(self):
         return self.plane_pose
@@ -235,7 +238,7 @@ class GazeboInterface(object):
         self.plane_board_controller_pub.publish(msg_z2)
 
         print(angle_z, angle_x, angle_z2)
-
+    """
 
 if __name__ == '__main__':
     rospy.init_node('gazebo_interface')
