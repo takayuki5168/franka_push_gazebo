@@ -12,29 +12,30 @@
     <arg name="rviz" value="false"/>
   </include>
 
+  <node name="add_ground_object" pkg="franka_push_gazebo" type="add_ground_object" /> -->
   <!-- plane -->
-  <group ns="plane">
-    <arg name="model_plane" default="$(find franka_push_gazebo)/worlds/plane.urdf"/>
-    <param name="robot_description" command="$(find xacro)/xacro $(arg model_plane)"/>
-    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model plane" />
-  </group>
-    <rosparam>
-    plane:
-      plane_z_joint_position_controller:
-        type: position_controllers/JointPositionController
-        joint: plane_z_joint
-        pid: {p: 100.0, i: 0.01, d: 10.0}
-      plane_x_joint_position_controller:
-        type: position_controllers/JointPositionController
-        joint: plane_x_joint
-        pid: {p: 100.0, i: 0.01, d: 10.0}
-      plane_board_joint_position_controller:
-        type: position_controllers/JointPositionController
-        joint: plane_board_joint
-        pid: {p: 100.0, i: 0.01, d: 10.0}
-    </rosparam>
-  <node name="controller_spawner_plane" pkg="controller_manager"
-    type="spawner" respawn="false"
-    output="screen" ns="/plane"
-    args="plane_z_joint_position_controller plane_x_joint_position_controller plane_board_joint_position_controller"/>
+  <!-- <group ns="plane"> -->
+  <!--   <arg name="model_plane" default="$(find franka_push_gazebo)/worlds/plane.urdf"/> -->
+  <!--   <param name="robot_description" command="$(find xacro)/xacro $(arg model_plane)"/> -->
+  <!--   <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model plane" /> -->
+  <!-- </group> -->
+  <!--   <rosparam> -->
+  <!--   plane: -->
+  <!--     plane_z_joint_position_controller: -->
+  <!--       type: position_controllers/JointPositionController -->
+  <!--       joint: plane_z_joint -->
+  <!--       pid: {p: 100.0, i: 0.01, d: 10.0} -->
+  <!--     plane_x_joint_position_controller: -->
+  <!--       type: position_controllers/JointPositionController -->
+  <!--       joint: plane_x_joint -->
+  <!--       pid: {p: 100.0, i: 0.01, d: 10.0} -->
+  <!--     plane_board_joint_position_controller: -->
+  <!--       type: position_controllers/JointPositionController -->
+  <!--       joint: plane_board_joint -->
+  <!--       pid: {p: 100.0, i: 0.01, d: 10.0} -->
+  <!--   </rosparam> -->
+  <!-- <node name="controller_spawner_plane" pkg="controller_manager" -->
+  <!--   type="spawner" respawn="false" -->
+  <!--   output="screen" ns="/plane" -->
+  <!--   args="plane_z_joint_position_controller plane_x_joint_position_controller plane_board_joint_position_controller"/> -->
 </launch>
