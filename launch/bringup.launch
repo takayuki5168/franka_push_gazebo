@@ -12,7 +12,7 @@
     <arg name="rviz" value="false"/>
   </include>
 
-  <node name="add_ground_object" pkg="franka_push_gazebo" type="add_ground_object" /> -->
+  <node name="add_objects" pkg="franka_push_gazebo" type="add_objects" /> -->
   <!-- plane -->
   <!-- <group ns="plane"> -->
   <!--   <arg name="model_plane" default="$(find franka_push_gazebo)/worlds/plane.urdf"/> -->

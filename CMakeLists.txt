@@ -69,5 +69,5 @@ include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE
 add_library(object_params_updater src/object_params_updater.cpp)
 target_link_libraries(object_params_updater ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
 
-add_executable(add_ground_object src/add_ground_object.cpp)
-target_link_libraries(add_ground_object ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+add_executable(add_objects src/add_objects.cpp)
+target_link_libraries(add_objects ${catkin_LIBRARIES} ${Boost_LIBRARIES})
