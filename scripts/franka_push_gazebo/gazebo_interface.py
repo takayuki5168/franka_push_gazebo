@@ -11,11 +11,13 @@ import rospy
 from std_msgs.msg import Float32MultiArray, Float64
 from gazebo_msgs.msg import ModelState, LinkStates
 from gazebo_msgs.srv import GetModelState, SetModelState, GetLinkProperties, SetLinkProperties
-from geometry_msgs.msg import Pose, Point, Quaternion
+from geometry_msgs.msg import Pose, Point, Quaternion, PoseStamped
 import moveit_commander
 
 class GazeboInterface(object):
-    def __init__(self, no_panda=False):
+    def __init__(self, no_panda=False, physical=False, body_name="RigidBody_05"):
+        self.physical = physical
+        
         # name
         self.robot_name = "panda"
         self.robot_hand_name = "panda_hand"
@@ -44,11 +46,15 @@ class GazeboInterface(object):
                     continue
 
         # wait /gazebo/get_model_state
-        rospy.wait_for_service('/gazebo/get_model_state')
+        if not self.physical:
+            rospy.wait_for_service('/gazebo/get_model_state')
 
         # delete gazebo defaulg log
-        f_name = glob.glob(os.environ['HOME'] + "/.gazebo/server*")[0] + "/default.log"
-        call(["rm", f_name])
+        try:
+            f_name = glob.glob(os.environ['HOME'] + "/.gazebo/server*")[0] + "/default.log"
+            call(["rm", f_name])
+        except:
+            pass
 
         # initial robot pose
         self.initial_joint_angles = [0.0, -0.785, 0.0, -2.356, 0.0, 1.571, 0.785]
@@ -65,10 +71,17 @@ class GazeboInterface(object):
         # object params
         self.object_params_pub = rospy.Publisher("object_plugin/params", Float32MultiArray, queue_size=1)
 
+        # mocap object pose
+        self.mocap_object_pose = Pose()
+        sub = rospy.Subscriber("/mocap/rigid_bodies/" + body_name + "/pose", PoseStamped, self.mocap_object_pose_cb)
+
     """
     def plane_state_cb(self, msg):
         self.plane_pose = msg.pose[msg.name.index("plane::plane_board_link")]
     """
+
+    def mocap_object_pose_cb(self, msg):
+        self.mocap_object_pose = msg.pose
 
     def sgn(self, a):
         return 1 if a > 0 else -1
@@ -79,7 +92,10 @@ class GazeboInterface(object):
         return get_object_state(self.object_name, self.origin_name)
 
     def get_object_pose(self):
-        return self.get_object_state().pose
+        if not self.physical:
+            return self.get_object_state().pose
+        else:
+            return self.mocap_object_pose
 
     def get_object_z(self):
         pose = self.get_object_pose().position
